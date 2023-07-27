@@ -16,8 +16,10 @@ import { motion } from "framer-motion";
 import { useDispatch } from "react-redux";
 import { authLogin } from "../../../store/actions/auth";
 import { LoadingSpinner } from "../../../components/Loading";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -90,6 +92,7 @@ const Login = () => {
           password: "",
         }));
         setTimeout(() => {
+          navigate("/magent-video");
           setSuccess(false);
         }, 3000);
       } else {
@@ -175,6 +178,9 @@ const Login = () => {
           </FormButton>
         </FormWrapper>
         <TextHandleTab
+          onClick={() => {
+            navigate("/register");
+          }}
           color={"rgba(8, 42, 62, 0.75)"}
           fontSize="16px"
           selected="none"

@@ -12,8 +12,10 @@ import {
   ContainerClient,
   ContainerContentClient,
 } from "./index";
+import { useNavigate } from "react-router-dom";
 
 const Welcome = () => {
+  const navigate = useNavigate();
   const control = useAnimation();
   const [ref, inView] = useInView();
 
@@ -57,6 +59,9 @@ const Welcome = () => {
               style={{ display: "flex", justifyContent: "center" }}
             >
               <WelcomeBottom
+                onClick={() => {
+                  navigate("/magent-video");
+                }}
                 background="linear-gradient(
       270deg,
       rgba(270, 255, 256, 0.5) 0%,

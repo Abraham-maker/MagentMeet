@@ -18,8 +18,10 @@ import { motion } from "framer-motion";
 import { useDispatch } from "react-redux";
 import { authRegister } from "../../../store/actions/auth";
 import { LoadingSpinner } from "../../../components/Loading";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -254,6 +256,9 @@ const Register = () => {
           </FormButton>
         </FormWrapper>
         <TextHandleTab
+          onClick={() => {
+            navigate("/login");
+          }}
           color={"rgba(8, 42, 62, 0.75)"}
           fontSize="16px"
           selected="none"
