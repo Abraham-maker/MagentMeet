@@ -2,8 +2,8 @@ import { styled } from "styled-components";
 import { media } from "../../styles/mediaQueries";
 
 export const FormSection = styled.div`
-  height: 100vh;
   width: 100%;
+  height: 100vh;
   background: linear-gradient(
       0deg,
       rgba(255, 255, 255, 0.85),
@@ -19,18 +19,19 @@ export const FormCard = styled.div`
   position: relative;
   background: #ffffff;
   min-width: 450px;
+  max-height: 668px;
   padding: 50px;
   display: flex;
-  justify-content: center;
   align-items: center;
   border-radius: 10px;
   flex-direction: column;
+  overflow: auto;
 
   ${media.sm`
   width: 100%;
   min-width: 0;
-  height:80%;
-  padding: 20px;
+  height:100%;
+  padding: 150px 10px 50px 10px;
   `}
 `;
 
@@ -147,4 +148,23 @@ export const FormMessage = styled.p`
   color: ${(props) => (props.$error ? "rgb(255, 51, 51)" : "rgb(34,187,51) ")};
   font-weight: 500;
   margin-top: 10px;
+`;
+
+export const Select = styled.select`
+  background: transparent;
+  height: 40px;
+  border-radius: 5px;
+  border: ${(props) => `1px solid ${props.border}`};
+  color: #000;
+  width: 100%;
+  font-size: 16px;
+  padding: 0px 10px;
+  font-family: "Be Vietnam Pro";
+  margin-bottom: ${(props) => props.marginbottom};
+  color: ${(props) => props.color};
+  margin-top: 20px;
+`;
+
+export const Option = styled.option`
+  color: ${(props) => props.color};
 `;

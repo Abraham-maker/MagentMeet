@@ -47,7 +47,7 @@ const Login = () => {
         })),
     },
     {
-      label: "Password:",
+      label: "Contraseña:",
       name: "password",
       type: "password",
       value: credential.password,
