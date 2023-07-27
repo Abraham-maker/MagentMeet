@@ -3,14 +3,14 @@ import { Provider } from "react-redux";
 import { applyMiddleware, createStore } from "redux";
 import ReduxThunk from "redux-thunk";
 import { rootReducer } from "./store/reducers";
-import Welcome from "./views/welcome/Welcome";
+import Login from "./views/auth/login/Login";
 
 const App = () => {
   const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 
   return (
     <Provider store={store}>
-      <Welcome />
+      <Login></Login>
     </Provider>
   );
 };
