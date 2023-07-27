@@ -2,6 +2,7 @@ import { SERVER_URL } from "../../environment/server";
 
 export const TOKEN = "TOKEN";
 export const USER_INFO = "USER_INFO";
+export const UPLOAD_PHOTO = "UPLOAD_PHOTO";
 
 export const authLogin = (email, password) => {
   return async () => {
@@ -67,6 +68,59 @@ export const getUserData = () => {
         dispatch({ type: USER_INFO, userData: data.data.user });
       })
       .catch((error) => console.log("error", error));
+  };
+};
+
+export const uploadPhotoProfile = (image, setIsLoading, setSelectedFile) => {
+  return async (dispatch, getState) => {
+    let formdata = new FormData();
+    formdata.append("profile_photo", image, "profile.jpg");
+    const response = await fetch(SERVER_URL + "profile-photo", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        Authorization: getState().auth.token.userData,
+      },
+      body: formdata,
+    });
+    const data = await response.json();
+    dispatch({ type: UPLOAD_PHOTO, uploadPhoto: data });
+    dispatch(getUserData());
+    setIsLoading(false);
+    setSelectedFile(null);
+    setTimeout(() => {
+      dispatch({ type: UPLOAD_PHOTO, uploadPhoto: {} });
+    }, 5000);
+  };
+};
+
+export const deletePhotoProfile = (setIsLoading) => {
+  return async (dispatch, getState) => {
+    const response = await fetch(SERVER_URL + `delete-profile-photo`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        Authorization: getState().auth.token.userData,
+      },
+    });
+
+    const data = await response.json();
+    dispatch(getUserData());
+    setIsLoading(false);
+    return data;
+  };
+};
+
+export const logout = () => {
+  return async (dispatch, getState) => {
+    localStorage.removeItem("userData");
+    await fetch(SERVER_URL + `logout`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        Authorization: getState().auth.token.userData,
+      },
+    }).then((response) => console.log(response.json()));
   };
 };
 

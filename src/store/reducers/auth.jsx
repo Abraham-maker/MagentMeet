@@ -1,8 +1,9 @@
-import { TOKEN, USER_INFO } from "../actions/auth";
+import { TOKEN, USER_INFO, UPLOAD_PHOTO } from "../actions/auth";
 
 const initialState = {
   token: null,
   userData: {},
+  uploadPhoto: {},
 };
 
 export default (state = initialState, action) => {
@@ -16,6 +17,11 @@ export default (state = initialState, action) => {
       return {
         ...state,
         userData: action.userData,
+      };
+    case UPLOAD_PHOTO:
+      return {
+        ...state,
+        uploadPhoto: action.uploadPhoto,
       };
     default:
       return state;

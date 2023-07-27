@@ -9,6 +9,7 @@ import TabsMenu from "../../components/TabsMenu";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserData } from "../../store/actions/auth";
 import { LoadingSpinner } from "../../components/Loading";
+import Profile from "../profile/Profile";
 
 const HomeContent = () => {
   const dispatch = useDispatch();
@@ -52,7 +53,7 @@ const HomeContent = () => {
         {activeTab === 0 && <>HOME</>}
         {activeTab === 1 && <>MESSAGES</>}
         {activeTab === 2 && <>RANKING</>}
-        {activeTab === 3 && <>PROFILE</>}
+        {activeTab === 3 && <Profile />}
       </BodyContent>
     </LayoutWrapper>
   );
