@@ -203,7 +203,6 @@ const Register = () => {
               name="gender"
               marginbottom="10px"
               border={"#cfcfcf"}
-              name="gender"
               onChange={handleOnChange}
               defaultValue={credential.gender}
               onFocus={() => {

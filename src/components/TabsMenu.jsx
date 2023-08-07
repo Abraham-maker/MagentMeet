@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   TabsMenuLeftContainer,
   ContentLeft,
@@ -31,13 +31,31 @@ import { useDispatch, useSelector } from "react-redux";
 import { setActiveTab } from "../store/actions/tabs";
 
 export const ListTabsMale = () => {
+  const [showMinutes, setShowMinutes] = useState(false);
+  const counterMale = useSelector((state) => state.auth.counterMale);
+
   return (
     <>
       <li>
         <ButtonSubHeader />
       </li>
-      <li>
-        <ButtonMinutesHeader>Minutes</ButtonMinutesHeader>
+      <li
+        onMouseOver={() => {
+          setShowMinutes(true);
+        }}
+        onMouseLeave={() => {
+          setShowMinutes(false);
+        }}
+      >
+        {showMinutes ? (
+          <ButtonMinutesHeader>{`minutes: ${parseInt(
+            counterMale / 60
+          )}`}</ButtonMinutesHeader>
+        ) : (
+          <ButtonMinutesHeader>
+            <img src="/assets/svg/clock.svg" alt="" />
+          </ButtonMinutesHeader>
+        )}
       </li>
       <li>
         <ButtonPremiumHeader>Get Premium</ButtonPremiumHeader>
@@ -46,13 +64,13 @@ export const ListTabsMale = () => {
   );
 };
 
-export const ListTabsFemale = () => {
+export const ListTabsFemale = ({ points, handleTabs }) => {
   return (
     <>
       <li>
         <ListGroup>
           <ButtonGroupOne>
-            <TextButtonOneGroup>points</TextButtonOneGroup>
+            <TextButtonOneGroup>{points}</TextButtonOneGroup>
           </ButtonGroupOne>
           <ButtonGroupTwo>
             <TextButtonTwoGroup>C</TextButtonTwoGroup>
@@ -65,7 +83,11 @@ export const ListTabsFemale = () => {
         </ButtonPorcentage>
       </li>
       <li style={{ marginLeft: "10px" }}>
-        <MobileRankingTab>
+        <MobileRankingTab
+          onClick={() => {
+            handleTabs(2);
+          }}
+        >
           <TextButtonRankingMobile>TOP</TextButtonRankingMobile>
         </MobileRankingTab>
       </li>
@@ -154,7 +176,9 @@ const TabsMenu = () => {
       <TabsMenuRightContainer>
         <ContentRight>
           {userData.gender === "male" && <ListTabsMale />}
-          {userData.gender === "female" && <ListTabsFemale />}
+          {userData.gender === "female" && (
+            <ListTabsFemale points={userData.points} handleTabs={handleTabs} />
+          )}
         </ContentRight>
         <ContainerAvatarAccount
           onClick={() => {

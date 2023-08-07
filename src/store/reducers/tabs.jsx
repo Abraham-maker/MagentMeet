@@ -1,4 +1,9 @@
-import { SET_ACTIVE_TAB, SHOW_VIDEO, SHOW_HOME } from "../actions/tabs";
+import {
+  SET_ACTIVE_TAB,
+  SHOW_VIDEO,
+  SHOW_HOME,
+  RESET_STATE_TABS,
+} from "../actions/tabs";
 
 const initialState = {
   activeTab: 0,
@@ -23,6 +28,8 @@ export default (state = initialState, action) => {
         ...state,
         showVideo: action.showVideo,
       };
+    case RESET_STATE_TABS:
+      return initialState;
     default:
       return state;
   }

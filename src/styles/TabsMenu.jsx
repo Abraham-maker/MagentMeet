@@ -148,20 +148,19 @@ export const ButtonSubHeader = styled.button`
 `;
 
 export const ButtonMinutesHeader = styled.button`
+  padding: 5px;
   margin-left: 10px;
-  padding: 4px 8px 3px;
   color: #fff;
   border: none;
   font-weight: 700;
-  font-size: 11px;
-  line-height: 13px;
+  font-size: 13px;
   background-color: #27a93c;
   border-radius: 2px;
-  display: block;
   overflow: hidden;
   white-space: nowrap;
   cursor: pointer;
-  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
 `;
 
 export const ButtonPremiumHeader = styled.button`
