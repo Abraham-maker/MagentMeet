@@ -1,45 +1,50 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FormSection,
   FormCard,
   FormTitle,
   FormWrapper,
-  ContainerInput,
-  FormLabel,
-  FormInput,
-  FormButton,
   TextHandleTab,
-  FormMessage,
-  Select,
-  Option,
 } from "../index";
-import { validateFormRegister } from "../ValidateAuth";
 import { motion } from "framer-motion";
 import { useDispatch } from "react-redux";
-import { authRegister } from "../../../store/actions/auth";
-import { LoadingSpinner } from "../../../components/Loading";
+import { authRegister, getListCountri } from "../../../store/actions/auth";
 import { useNavigate } from "react-router-dom";
+import StepOne from "./StepOne";
+import StepTwo from "./StepTwo";
+import StepThree from "./StepThree";
+import StepFour from "./StepFour";
+import StepFive from "./StepFive";
 
 const Register = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [success, setSuccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [step, setStep] = useState(0);
+  const [codePhone, setCodePhone] = useState(false);
   const [errorRegister, setErrorRegister] = useState({
     errorGender: "",
     errorName: "",
     errorEmail: "",
     errorPassword: "",
     errorConfirmPassword: "",
+    errorPhone: "",
+    errorCountry: "",
+    errorTerms: "",
+    errorBirthdate: "",
+    errorOtp: "",
   });
 
   const [credential, setCredential] = useState({
     email: "",
     password: "",
-    gender: "",
-    name: "",
     password_confirmation: "",
-    terms: 0,
+    name: "",
+    gender: "",
+    phone: "",
+    country_id: "",
+    birthdate: "",
+    otp: "",
+    terms: false,
   });
 
   const messageVariants = {
@@ -52,90 +57,53 @@ const Register = () => {
     setCredential((state) => ({ ...state, [name]: value }));
   };
 
-  const formData = [
-    {
-      label: "Email:",
-      name: "email",
-      type: "email",
-      value: credential.email,
-      error: errorRegister.errorEmail,
-      onChange: (e) => handleOnChange(e),
-    },
-    {
-      label: "Nombre:",
-      name: "name",
-      type: "text",
-      value: credential.name,
-      error: errorRegister.errorName,
-      onChange: (e) => handleOnChange(e),
-    },
-    {
-      label: "Contraseña:",
-      name: "password",
-      type: "password",
-      value: credential.password,
-      error: errorRegister.errorPassword,
-      onChange: (e) => handleOnChange(e),
-    },
-    {
-      label: "Confirmar contraseña:",
-      name: "password_confirmation",
-      type: "password",
-      value: credential.password_confirmation,
-      error: errorRegister.errorConfirmPassword,
-      onChange: (e) => handleOnChange(e),
-    },
-  ];
+  useEffect(() => {
+    dispatch(getListCountri());
+  }, []);
 
-  const handleRegister = async (e) => {
-    setIsLoading(true);
-    e.preventDefault();
-    const isValid = validateFormRegister(
-      credential.email,
-      credential.password,
-      credential.password_confirmation,
-      credential.name,
-      credential.gender,
-      setErrorRegister
+  const handleRegister = async (setIsLoading) => {
+    const response = await dispatch(
+      authRegister(
+        credential.email,
+        credential.gender,
+        credential.name,
+        credential.password,
+        credential.password_confirmation
+      )
     );
-
-    if (isValid) {
-      const response = await dispatch(
-        authRegister(
-          credential.email,
-          credential.gender,
-          credential.name,
-          credential.password,
-          credential.password_confirmation
-        )
-      );
-      if (response.status === "Success") {
-        setSuccess(true);
-        setCredential({
-          email: "",
-          password: "",
-          gender: "",
-          name: "",
-          password_confirmation: "",
-          terms: 0,
-        });
-        setErrorRegister({
-          errorGender: "",
-          errorName: "",
-          errorEmail: "",
-          errorPassword: "",
-          errorConfirmPassword: "",
-        });
-        setTimeout(() => {
-          setSuccess(false);
-        }, 3000);
-      } else {
-        if (response.message === "El email ya se encuentra registrado") {
-          setErrorRegister((prev) => ({
-            ...prev,
-            errorEmail: "El email ya se encuentra registrado",
-          }));
-        }
+    if (response.status === "Success") {
+      setStep(4);
+      setCredential({
+        email: "",
+        password: "",
+        password_confirmation: "",
+        name: "",
+        gender: "",
+        phone: "",
+        country_id: "",
+        birthdate: "",
+        otp: "",
+        terms: false,
+      });
+      setErrorRegister({
+        errorGender: "",
+        errorName: "",
+        errorEmail: "",
+        errorPassword: "",
+        errorConfirmPassword: "",
+        errorPhone: "",
+        errorCountry: "",
+        errorTerms: "",
+        errorBirthdate: "",
+        errorOtp: "",
+      });
+    } else {
+      if (response.message === "El email ya se encuentra registrado") {
+        setStep(0);
+        setErrorRegister((prev) => ({
+          ...prev,
+          errorEmail: "El email ya se encuentra registrado",
+        }));
       }
     }
     setIsLoading(false);
@@ -143,140 +111,86 @@ const Register = () => {
 
   return (
     <FormSection>
-      <FormCard
-        as={motion.div}
-        variants={messageVariants}
-        initial="hidden"
-        animate="animate"
-      >
-        <FormWrapper onSubmit={handleRegister}>
-          <FormTitle>Registrate</FormTitle>
-          {formData.map((prev, index) => {
-            return (
-              <ContainerInput key={index}>
-                <FormLabel>{prev.label}</FormLabel>
-                <FormInput
-                  onChange={prev.onChange}
-                  onFocus={() => {
-                    setErrorRegister({
-                      errorGender: "",
-                      errorName: "",
-                      errorEmail: "",
-                      errorPassword: "",
-                      errorConfirmPassword: "",
-                    });
-                  }}
-                  type={prev.type}
-                  name={prev.name}
-                  border={
-                    errorRegister.errorEmail !== "" ||
-                    errorRegister.errorPassword !== "" ||
-                    errorRegister.errorName !== "" ||
-                    errorRegister.errorConfirmPassword !== ""
-                      ? "rgb(255, 51, 51)"
-                      : "#cfcfcf"
-                  }
-                  value={prev.value}
-                />
-                {errorRegister.errorEmail !== "" ||
-                errorRegister.errorPassword !== "" ||
-                errorRegister.errorName !== "" ||
-                errorRegister.errorConfirmPassword !== "" ? (
-                  <FormMessage
-                    $error
-                    as={motion.div}
-                    variants={messageVariants}
-                    initial="hidden"
-                    animate="animate"
-                  >
-                    {prev.error}
-                  </FormMessage>
-                ) : (
-                  false
-                )}
-              </ContainerInput>
-            );
-          })}
-          <div style={{ width: "100%", marginTop: "20px" }}>
-            <FormLabel>Género:</FormLabel>
-            <Select
-              name="gender"
-              marginbottom="10px"
-              border={"#cfcfcf"}
-              onChange={handleOnChange}
-              defaultValue={credential.gender}
-              onFocus={() => {
-                setErrorRegister({
-                  errorGender: "",
-                  errorName: "",
-                  errorEmail: "",
-                  errorPassword: "",
-                  errorConfirmPassword: "",
-                });
-              }}
-            >
-              <Option value="">Género</Option>
-              <Option value="male">Hombre</Option>
-              <Option value="female">Mujer</Option>
-            </Select>
-            {errorRegister.errorGender !== "" ? (
-              <FormMessage
-                $error
-                as={motion.div}
-                variants={messageVariants}
-                initial="hidden"
-                animate="animate"
-              >
-                {errorRegister.errorGender}
-              </FormMessage>
-            ) : (
-              false
-            )}
-          </div>
-          <FormButton
-            disabled={isLoading}
-            margintop="20px"
-            border={"#4bafe1"}
-            color={"#fff"}
-            height="45px"
-            width="100%"
-            fontSize="16px"
-          >
-            {isLoading ? (
-              <LoadingSpinner
-                width="30px"
-                height="30px"
-                color={"#fff"}
-                background={"#4bafe1"}
-              />
-            ) : (
-              <span>Continuar</span>
-            )}
-          </FormButton>
-        </FormWrapper>
-        <TextHandleTab
-          onClick={() => {
-            navigate("/login");
-          }}
-          color={"rgba(8, 42, 62, 0.75)"}
-          fontSize="16px"
-          selected="none"
-          marginbottom="20px"
+      <FormCard>
+        <FormWrapper
+          as={motion.div}
+          variants={messageVariants}
+          initial="hidden"
+          animate="animate"
         >
-          ¿Ya Tienes Cuenta?,{" "}
-          <TextHandleTab color={"rgba(57, 128, 192,1)"}>
-            Inicia sesión
-          </TextHandleTab>
-        </TextHandleTab>
-        {success && (
-          <FormMessage
-            as={motion.div}
-            variants={messageVariants}
-            initial="hidden"
-            animate="animate"
+          {step === 0 ? (
+            <FormTitle>Registrate</FormTitle>
+          ) : step === 1 ? (
+            <FormTitle>Presentate</FormTitle>
+          ) : step === 4 ? (
+            <FormTitle>Registro éxitoso</FormTitle>
+          ) : (
+            <FormTitle>Verificación</FormTitle>
+          )}
+          {step === 0 && (
+            <StepOne
+              handleOnChange={handleOnChange}
+              credential={credential}
+              errorRegister={errorRegister}
+              setStep={setStep}
+              setErrorRegister={setErrorRegister}
+            />
+          )}
+          {step === 1 && (
+            <StepTwo
+              handleOnChange={handleOnChange}
+              credential={credential}
+              errorRegister={errorRegister}
+              setStep={setStep}
+              setErrorRegister={setErrorRegister}
+              setCredential={setCredential}
+              codePhone={codePhone}
+              setCodePhone={setCodePhone}
+            />
+          )}
+
+          {step === 2 && (
+            <StepThree
+              handleOnChange={handleOnChange}
+              credential={credential}
+              errorRegister={errorRegister}
+              setStep={setStep}
+              setErrorRegister={setErrorRegister}
+              setCredential={setCredential}
+            />
+          )}
+
+          {step === 3 && (
+            <StepFour
+              handleOnChange={handleOnChange}
+              credential={credential}
+              errorRegister={errorRegister}
+              setStep={setStep}
+              setErrorRegister={setErrorRegister}
+              setCredential={setCredential}
+              step={step}
+              handleRegister={handleRegister}
+            />
+          )}
+
+          {step === 4 && <StepFive />}
+        </FormWrapper>
+
+        {step === 0 && (
+          <TextHandleTab
+            onClick={() => {
+              navigate("/login");
+            }}
+            color={"rgba(8, 42, 62, 0.75)"}
+            fontSize="16px"
+            selected="none"
+            marginbottom="20px"
           >
-            Su registro fue exitoso
-          </FormMessage>
+            ¿Ya Tienes Cuenta?,{" "}
+            <TextHandleTab color={"rgba(57, 128, 192,1)"}>
+              Inicia sesión
+            </TextHandleTab>
+          </TextHandleTab>
         )}
       </FormCard>
     </FormSection>

@@ -60,6 +60,7 @@ export const FormWrapper = styled.form`
 export const ContainerInput = styled.div`
   width: 100%;
   margin-top: 20px;
+  position: relative;
 `;
 
 export const FormLabel = styled.label`
@@ -79,6 +80,17 @@ export const FormInput = styled.input`
   border: none;
   border-bottom: ${(props) => `1px solid ${props.border}`};
   font-size: 1rem;
+`;
+
+export const FormInputName = styled.input`
+  padding-left: 10px;
+  outline: none;
+  border-radius: 2px;
+  height: 35px;
+  width: 100%;
+  border: none;
+  font-size: 14px;
+  background-color: #f4f4f4;
 `;
 
 export const FormButton = styled.button`
@@ -156,15 +168,98 @@ export const Select = styled.select`
   border-radius: 5px;
   border: ${(props) => `1px solid ${props.border}`};
   color: #000;
-  width: 100%;
+  width: ${(props) => props.width};
   font-size: 16px;
   padding: 0px 10px;
-  font-family: "Be Vietnam Pro";
-  margin-bottom: ${(props) => props.marginbottom};
-  color: ${(props) => props.color};
-  margin-top: 20px;
+`;
+
+export const SelectPhone = styled.select`
+  background: transparent;
+  height: 40px;
+  border: none;
+  border-bottom: ${(props) => `1px solid ${props.border}`};
+  color: #000;
+  width: ${(props) => props.width};
+  font-size: 16px;
 `;
 
 export const Option = styled.option`
   color: ${(props) => props.color};
+`;
+
+export const ViewPassword = styled.div`
+  position: absolute;
+  height: 25px;
+  width: 25px;
+  right: 10px;
+  padding: 8px;
+`;
+
+export const ViewPasswordContainer = styled.div`
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  img {
+    height: 100%;
+    width: 100%;
+  }
+`;
+
+export const SelectedGender = styled.div`
+  width: 100%;
+  height: 80px;
+  display: flex;
+  gap: 10px;
+`;
+
+export const SelectedGenderContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 5px 5px 5px 3px rgba(0, 0, 0, 0.2);
+  border: 2px solid ${(props) => props.border};
+`;
+
+export const PhoneContainer = styled.div`
+  width: 100%;
+  height: 40px;
+`;
+
+export const PhoneContent = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+`;
+
+export const FormInputPhone = styled.input`
+  display: block;
+  outline: none;
+  border-radius: 2px;
+  height: 36px;
+  width: 80%;
+  border: none;
+  border-bottom: ${(props) => `1px solid ${props.border}`};
+  font-size: 1rem;
+`;
+
+export const CheckboxContainer = styled.div`
+  margin-top: 30px;
+  width: 100%;
+  height: 40px;
+  color: #000;
+`;
+
+export const Checkbox = styled.input.attrs({ type: "checkbox" })`
+  width: 20px;
+  height: 20px;
 `;

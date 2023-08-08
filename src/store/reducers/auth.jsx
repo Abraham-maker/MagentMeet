@@ -8,6 +8,7 @@ import {
   COUNTER_MALE,
   TIEMPO_RESTANTE,
   RESET_STATE_AUTH,
+  COUNTRIS,
 } from "../actions/auth";
 
 const initialState = {
@@ -19,6 +20,7 @@ const initialState = {
   intervalID: null,
   counterMale: 0,
   timeRemaining: null,
+  countris: [],
 };
 
 export default (state = initialState, action) => {
@@ -62,6 +64,11 @@ export default (state = initialState, action) => {
       return {
         ...state,
         timeRemaining: action.timeRemaining,
+      };
+    case COUNTRIS:
+      return {
+        ...state,
+        countris: action.countris,
       };
     case RESET_STATE_AUTH:
       return initialState;

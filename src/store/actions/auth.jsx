@@ -12,6 +12,7 @@ export const INCREMENT_SECONDS = "INCREMENT_SECONDS";
 export const INTERVAL_ID = "INTERVAL_ID";
 export const COUNTER_MALE = "COUNTER_MALE";
 export const TIEMPO_RESTANTE = "TIEMPO_RESTANTE";
+export const COUNTRIS = "COUNTRIS";
 export const RESET_STATE_AUTH = "RESET_STATE_AUTH";
 
 export const authLogin = (email, password) => {
@@ -236,5 +237,152 @@ export const deleteCounterFemale = () => {
       type: INCREMENT_SECONDS,
       seconds: 0,
     });
+  };
+};
+
+export const getListCountri = () => {
+  return async (dispatch) => {
+    await fetch(SERVER_URL + "countries", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then(({ data }) => {
+        dispatch({ type: COUNTRIS, countris: data });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+};
+
+export const sendCodeVerification = (email, setIsLoading, setSuccess) => {
+  return async () => {
+    let formdata = new FormData();
+    formdata.append("email", email);
+
+    await fetch(SERVER_URL + "request-otp", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+      },
+      body: formdata,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status === 200) {
+          setSuccess({
+            message: "Código de verificación enviado con éxito",
+            status: 200,
+          });
+        }
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+};
+
+export const codeVerification = (
+  email,
+  otp,
+  setErrorRegister,
+  setIsLoading,
+  setSuccess
+) => {
+  return async () => {
+    let formdata = new FormData();
+    formdata.append("email", email);
+    formdata.append("otp", otp);
+
+    await fetch(SERVER_URL + "verify-otp", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+      },
+      body: formdata,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status === 200) {
+          setSuccess({
+            message: "Código de verificado con éxito",
+            status: 200,
+          });
+        } else {
+          setErrorRegister((state) => ({
+            ...state,
+            errorOtp: "Código invalido",
+          }));
+          setIsLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+};
+
+export const editProfile = (name, email, setIsLoading, setSuccess) => {
+  return async (dispatch, getState) => {
+    var formdata = new FormData();
+    formdata.append("name", name);
+    formdata.append("email", email);
+
+    fetch(SERVER_URL + "update-profile", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        Authorization: getState().auth.token.userData,
+      },
+      body: formdata,
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.status === "Success") {
+          setSuccess({ status: 200, message: result.message });
+          dispatch(getUserData());
+        }
+        setIsLoading(false);
+        console.log(result);
+      })
+      .catch((error) => console.log("error", error));
+  };
+};
+
+export const editPassword = (
+  password_old,
+  password,
+  password_confirmation,
+  setIsLoadingPass,
+  setSuccessPass
+) => {
+  return async (dispatch, getState) => {
+    var formdata = new FormData();
+    formdata.append("password_old", password_old);
+    formdata.append("password", password);
+    formdata.append("password_confirmation", password_confirmation);
+
+    fetch(SERVER_URL + "update-password", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        Authorization: getState().auth.token.userData,
+      },
+      body: formdata,
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.status === "Success") {
+          setSuccessPass({ status: 200, message: result.message });
+          dispatch(getUserData());
+        }
+        setIsLoadingPass(false);
+        console.log(result);
+      })
+      .catch((error) => console.log("error", error));
   };
 };

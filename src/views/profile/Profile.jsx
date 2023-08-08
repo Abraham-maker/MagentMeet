@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   ProfileContainer,
@@ -14,15 +14,21 @@ import {
   BottomProfile,
   ContainerBottoms,
   Message,
+  BottomEditName,
 } from "./index";
 import {
   uploadPhotoProfile,
   deletePhotoProfile,
   logout,
+  editProfile,
+  editPassword,
 } from "../../store/actions/auth";
 import { motion } from "framer-motion";
 import { LoadingSpinner } from "../../components/Loading";
 import { useNavigate } from "react-router-dom";
+import EditUser from "./EditUser";
+import { emailRegex } from "../../environment/constans";
+import { ContainerInput, FormInputName, FormMessage } from "../auth";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -31,6 +37,27 @@ const Profile = () => {
   const uploadPhoto = useSelector((state) => state.auth.uploadPhoto);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingName, setIsLoadingName] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [editName, setEditName] = useState(false);
+  const [errors, setErrors] = useState({
+    errorEmail: "",
+    errorName: "",
+    errorPassword: "",
+    errorPasswordConfirm: "",
+  });
+  const [infoUser, setInfoUser] = useState({
+    name: userData.name,
+    email: userData.email,
+    password_old: "",
+    password: "",
+    password_confirmation: "",
+  });
+
+  const handleOnChange = ({ target }) => {
+    const { name, value } = target;
+    setInfoUser((state) => ({ ...state, [name]: value }));
+  };
 
   const messageVariants = {
     hidden: { y: 30, opacity: 0 },
@@ -52,12 +79,181 @@ const Profile = () => {
     dispatch(deletePhotoProfile(setIsLoading));
   };
 
+  useEffect(() => {
+    if (success.status === 200) {
+      setTimeout(() => {
+        setSuccess(false);
+      }, 2500);
+    }
+  }, [success]);
+
+  const handleEditProfile = async (setIsLoading, setSuccess) => {
+    let isValid = true;
+
+    if (infoUser.email.length === 0) {
+      isValid = false;
+      setErrors((prevState) => ({
+        ...prevState,
+        errorEmail: "Campo requerido",
+      }));
+      setIsLoading(false);
+    } else if (infoUser.email.length < 3) {
+      isValid = false;
+      setErrors((prevState) => ({
+        ...prevState,
+        errorEmail: "El min de caracteres es de 3",
+      }));
+      setIsLoading(false);
+    }
+
+    if (!emailRegex.test(infoUser.email) && infoUser.email.length > 0) {
+      isValid = false;
+      setErrors((prevState) => ({
+        ...prevState,
+        errorEmail: "Ingrese un email valido",
+      }));
+      setIsLoading(false);
+    }
+
+    if (infoUser.name.length === 0) {
+      isValid = false;
+      setErrors((state) => ({ ...state, errorName: "Campo requerido" }));
+      setIsLoading(false);
+    } else if (infoUser.name.length < 3) {
+      isValid = false;
+      setErrors((state) => ({
+        ...state,
+        errorName: "El min de caracteres es de 3",
+      }));
+      setIsLoading(false);
+    }
+
+    if (isValid) {
+      await dispatch(
+        editProfile(infoUser.name, infoUser.email, setIsLoading, setSuccess)
+      );
+      setEditName(false);
+    }
+  };
+
+  const handleUpdatePassword = (setIsLoadingPass, setSuccessPass) => {
+    let isValid = true;
+    if (infoUser.password.length === 0) {
+      isValid = false;
+      setErrors((state) => ({
+        ...state,
+        errorPassword: "Campo requerido",
+      }));
+      setIsLoadingPass(false);
+    } else if (infoUser.password.length < 6) {
+      isValid = false;
+      setErrors((state) => ({
+        ...state,
+        errorPassword: "El min de caracteres es de 6",
+      }));
+      setIsLoadingPass(false);
+    }
+
+    if (infoUser.password_confirmation.length === 0) {
+      isValid = false;
+      setErrors((state) => ({
+        ...state,
+        errorPasswordConfirm: "Campo requerido",
+      }));
+      setIsLoadingPass(false);
+    } else if (infoUser.password_confirmation.length < 6) {
+      isValid = false;
+      setErrors((state) => ({
+        ...state,
+        errorPasswordConfirm: "El min de caracteres es de 6",
+      }));
+      setIsLoadingPass(false);
+    }
+
+    if (infoUser.password.trim() !== infoUser.password_confirmation.trim()) {
+      isValid = false;
+      setErrors((state) => ({
+        ...state,
+        errorPassword: "Las contraseñas no coinciden",
+      }));
+      setIsLoadingPass(false);
+    }
+
+    if (isValid) {
+      dispatch(
+        editPassword(
+          infoUser.password_old,
+          infoUser.password,
+          infoUser.password_confirmation,
+          setIsLoadingPass,
+          setSuccessPass
+        )
+      );
+    }
+  };
+
   return (
     <ProfileContainer>
       <ContainerName>
-        <ParagraphName>{userData.name}</ParagraphName>
-        <ContainerIconEdit>
-          <img src="/assets/svg/edit.svg" alt="" />
+        {editName ? (
+          <ContainerInput>
+            <FormInputName
+              placeholder="Nuevo Nombre"
+              type={"text"}
+              onChange={handleOnChange}
+              name={"name"}
+              border={"#000"}
+            />
+            <BottomEditName
+              onClick={() => {
+                setIsLoadingName(true);
+                handleEditProfile(setIsLoadingName, setSuccess);
+              }}
+              color="#fff"
+              background={userData.gender === "male" ? "#1ca5fc" : "#e83e8c"}
+            >
+              {isLoadingName ? "LOADING" : "Guardar"}
+            </BottomEditName>
+            {success.status === 200 && (
+              <FormMessage
+                as={motion.div}
+                variants={messageVariants}
+                initial="hidden"
+                animate="animate"
+              >
+                {success.message}
+              </FormMessage>
+            )}
+            {errors.errorName !== "" ? (
+              <FormMessage
+                $error
+                as={motion.div}
+                variants={messageVariants}
+                initial="hidden"
+                animate="animate"
+              >
+                {errors.errorName}
+              </FormMessage>
+            ) : (
+              false
+            )}
+          </ContainerInput>
+        ) : (
+          <>
+            {" "}
+            <ParagraphName>{userData.name}</ParagraphName>{" "}
+          </>
+        )}
+        <ContainerIconEdit
+          onClick={() => {
+            setEditName(!editName);
+          }}
+        >
+          {editName ? (
+            <img src="/assets/svg/close.svg" alt="" />
+          ) : (
+            <img src="/assets/svg/edit.svg" alt="" />
+          )}
         </ContainerIconEdit>
       </ContainerName>
       <ContainerPhoto>
@@ -190,6 +386,15 @@ const Profile = () => {
           <img src="/assets/svg/logout.svg" alt="img" />
         </ButtonLogout>
       </ContainerLogout>
+
+      <EditUser
+        handleOnChange={handleOnChange}
+        infoUser={infoUser}
+        handleEditProfile={handleEditProfile}
+        errors={errors}
+        handleUpdatePassword={handleUpdatePassword}
+        setErrors={setErrors}
+      />
     </ProfileContainer>
   );
 };
