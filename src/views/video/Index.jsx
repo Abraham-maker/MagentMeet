@@ -25,7 +25,6 @@ const Index = ({ show }) => {
   const minutes = useSelector((state) => state.auth.minutes);
   const membersChannel = useSelector((state) => state.agora.membersChannel);
 
-  const [intervalId, setIntervalId] = useState(null);
   const [showControls, setShowControls] = useState(false);
   const [showMessages, setShowMessages] = useState(true);
   const [showGift, setShowGift] = useState(false);
@@ -34,13 +33,16 @@ const Index = ({ show }) => {
 
   useEffect(() => {
     if (userData.gender === "male") {
-      dispatch(getGiftUser());
       const intervalId = setInterval(() => {
         dispatch(getChannelActive());
       }, 5000);
       return () => clearInterval(intervalId);
     }
   }, [userData]);
+
+  useEffect(() => {
+    dispatch(getGiftUser());
+  }, []);
 
   return (
     <ContainerVideo show={show}>
@@ -59,11 +61,11 @@ const Index = ({ show }) => {
 
       <MessagesList showMessages={showMessages} showControls={showControls} />
 
-      {/* <GiftList
+      <GiftList
         setShowGift={setShowGift}
         showGift={showGift}
         userData={userData}
-      /> */}
+      />
 
       <Controles
         userData={userData}
@@ -73,12 +75,11 @@ const Index = ({ show }) => {
         setShowControls={setShowControls}
       />
 
-      {/* 
       <RegalosList
         userData={userData}
         showRegalos={showRegalos}
         setRegalos={setRegalos}
-      /> */}
+      />
 
       <TextArea>
         <Input

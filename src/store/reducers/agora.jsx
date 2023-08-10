@@ -17,6 +17,8 @@ import {
   RESET_GIFT_RECEIVED,
   RESET_GIFT_SENDING,
   RESET_STATE_AGORA,
+  MEMBER_UPDATE_LEFT,
+  RESET_MEMBERS_CHANNEL,
 } from "../actions/agora";
 
 const initialState = {
@@ -37,7 +39,6 @@ const initialState = {
   agoraErrors: {},
   isLoading: false,
   counterFemale: 0,
-  listGift: [],
   muted: false,
 };
 
@@ -88,6 +89,11 @@ export default (state = initialState, action) => {
         ...state,
         giftReceived: [...state.giftReceived, action.giftReceived],
       };
+    case GIFT_SENDING:
+      return {
+        ...state,
+        giftSending: [...state.giftSending, action.giftSending],
+      };
     case RESET_GIFT_RECEIVED:
       return {
         ...state,
@@ -102,6 +108,19 @@ export default (state = initialState, action) => {
       return {
         ...state,
         membersChannel: [...state.membersChannel, action.membersChannel],
+      };
+    case RESET_MEMBERS_CHANNEL:
+      return {
+        ...state,
+        membersChannel: action.membersChannel,
+      };
+    case MEMBER_UPDATE_LEFT:
+      const memberId = action.payload;
+      return {
+        ...state,
+        membersChannel: state.membersChannel.filter(
+          (memberID) => memberID.memberId !== memberId
+        ),
       };
     case COUNTER_FEMALE:
       return {

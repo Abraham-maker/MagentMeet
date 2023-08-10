@@ -9,8 +9,15 @@ import {
   saveChannel,
   saveMembersChannel,
   saveMessages,
+  saveGift,
+  saveGiftSending,
+  RESET_MESSAGES,
+  RESET_GIFT_RECEIVED,
+  RESET_GIFT_SENDING,
+  setMembersChannel,
 } from "./agora";
 import AgoraRTM from "agora-rtm-sdk";
+import { sendGiftHost, translate } from "./functionsAgora";
 
 export const initAgoraRTM = () => {
   return async (dispatch, getState) => {
@@ -30,13 +37,13 @@ export const initAgoraRTM = () => {
       dispatch(handleMemberJoined(memberId));
     });
 
-    // await clientRtm.on("MessageFromPeer", async (message, senderId) => {
-    //   handleGiftMessage(message, senderId);
-    // });
+    await clientRtm.on("MessageFromPeer", async (message, senderId) => {
+      await dispatch(saveGift(message, senderId));
+    });
 
-    // await channel.on("MemberLeft", async (memberId) => {
-    //   handleMemberLeft(memberId);
-    // });
+    await channel.on("MemberLeft", async (memberId) => {
+      await dispatch(handleMemberLeft(memberId));
+    });
   };
 };
 
@@ -129,27 +136,24 @@ export const getChannelMembers = () => {
 export const handleSendMessage = (message) => {
   return async (dispatch, getState) => {
     const { channel, rtmUid } = getState().agora;
-    await channel.sendMessage({ text: message });
-    await dispatch(saveMessages({ text: message }, rtmUid));
+    const response = await dispatch(translate(message, rtmUid));
+    if (response.status === "Success") {
+      const { data } = response;
+      await dispatch(saveMessages(data.text, data.translations, data.senderid));
+    }
+    await channel.sendMessage({ text: message }, rtmUid);
   };
 };
 
-// export const handleMessageGift = () => {
-//   return async () => {
-//     const { memberId } = membersChannel.find((m) => m.memberId !== rtmUid);
-//     const response = await sendGiftToFemale(id, userIDRemote, giftID);
-//     if (response.status === "Success") {
-//       clientRtm.sendMessageToPeer(
-//         { text: ` Te han enviado ${points} Pts ${giftID}` },
-//         memberId
-//       );
-//       setReceivedPoints((prev) => [
-//         ...prev,
-//         {
-//           text: `Has enviado un regalo de ${points} Pts ${giftID}`,
-//           sender: rtmUid,
-//         },
-//       ]);
-//     }
-//   };
-// };
+export const handleMessageGift = (giftID, points) => {
+  return async (dispatch, getState) => {
+    const { membersChannel, rtmUid, clientRtm } = getState().agora;
+    const { memberId } = membersChannel.find((m) => m.memberId !== rtmUid);
+    const response = await dispatch(sendGiftHost(giftID));
+    if (response.status === "Success") {
+      const data = { text: `haz enviado un regalo de ${points}pts` };
+      await clientRtm.sendMessageToPeer({ text: `${points}` }, memberId);
+      dispatch(saveGiftSending(data, rtmUid));
+    }
+  };
+};

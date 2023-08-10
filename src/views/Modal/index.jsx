@@ -2,7 +2,7 @@ import { styled, css } from "styled-components";
 
 export const ModalGlobal = styled.div`
   position: absolute;
-  z-index: 5555;
+  z-index: 9999;
   background-color: rgba(0, 0, 0, 0.5);
   width: 100%;
   height: 100%;

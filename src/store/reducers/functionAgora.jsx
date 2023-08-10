@@ -10,6 +10,7 @@ const initialState = {
   channelActive: [],
   idHostCreateMale: null,
   idRemoteUser: null,
+  listGift: [],
 };
 
 export default (state = initialState, action) => {

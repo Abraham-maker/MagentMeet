@@ -1,9 +1,16 @@
 import React from "react";
 import { Gift, GiftContainer, IconGift } from "../../styles/Video";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { handleMessageGift } from "../../store/actions/agoraRTM";
 
 const GiftList = ({ setShowGift, showGift, userData }) => {
-  const listGift = useSelector((state) => state.agora.listGift);
+  const dispatch = useDispatch();
+  const listGift = useSelector((state) => state.functionAgora.listGift);
+
+  const handleSendGift = async (id, points) => {
+    await dispatch(handleMessageGift(id, points));
+  };
+
   return (
     <>
       {userData.gender === "male" && (
@@ -22,9 +29,14 @@ const GiftList = ({ setShowGift, showGift, userData }) => {
             {!showGift && <img src="/assets/svg/gift.svg" alt="" />}
             {showGift && (
               <>
-                {listGift.map(({ id, name, image }) => {
+                {listGift.map(({ id, name, image, points }) => {
                   return (
-                    <IconGift key={id}>
+                    <IconGift
+                      key={id}
+                      onClick={() => {
+                        handleSendGift(id, points);
+                      }}
+                    >
                       <img src={image} alt="gift" />
                     </IconGift>
                   );

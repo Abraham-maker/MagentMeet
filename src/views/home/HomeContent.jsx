@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import LayoutWrapper from "../../layout/LayoutWrapper";
 import {
   HeaderContent,
@@ -7,7 +7,11 @@ import {
 } from "../../styles/HomeContent";
 import TabsMenu from "../../components/TabsMenu";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserData, updateCounterMale } from "../../store/actions/auth";
+import {
+  getMyStories,
+  getUserData,
+  updateCounterMale,
+} from "../../store/actions/auth";
 import { LoadingSpinner } from "../../components/Loading";
 import Profile from "../profile/Profile";
 import StartHome from "./StartHome";
@@ -16,14 +20,24 @@ import Video from "../video/Index";
 import ModalPermission from "../Modal/ModalPermission";
 import ModalChannel from "../Modal/ModalChannel";
 import ModalBloquedPermission from "../Modal/ModalBloquedPermission";
+import Stories from "../stories/Stories";
+import UploadStorie from "../stories/UploadStorie";
+import Kyc from "../kyc/Kyc";
+import Verification from "../kyc/Verification";
+import Ranking from "../ranking/Ranking";
+import ModalMinutes from "../Modal/ModalMinutes";
 
 const HomeContent = () => {
   const dispatch = useDispatch();
+  const [showStories, setShowStories] = useState(false);
+  const [showUploadStorie, setShowUploadStorie] = useState(false);
+  const [showVerification, setShowVerification] = useState(false);
   const userData = useSelector((state) => state.auth.userData);
   const activeTab = useSelector((state) => state.tabs.activeTab);
   const showVideo = useSelector((state) => state.tabs.showVideo);
   const modalChannel = useSelector((state) => state.modals.modalChannel);
   const modalBloqued = useSelector((state) => state.modals.modalBloqued);
+  const modalMinutes = useSelector((state) => state.modals.modalMinutes);
   const modalPermissions = useSelector(
     (state) => state.modals.modalPermissions
   );
@@ -34,6 +48,9 @@ const HomeContent = () => {
 
   useEffect(() => {
     dispatch(updateCounterMale(userData.minutes * 60));
+    if (userData.gender === "female") {
+      dispatch(getMyStories());
+    }
   }, [userData]);
 
   if (Object.entries(userData).length === 0) {
@@ -63,7 +80,14 @@ const HomeContent = () => {
       {modalPermissions && <ModalPermission />}
       {modalChannel && <ModalChannel />}
       {modalBloqued && <ModalBloquedPermission />}
-
+      {modalMinutes && <ModalMinutes />}
+      {showStories && <Stories showStories={setShowStories} />}
+      {showUploadStorie && (
+        <UploadStorie setShowUploadStorie={setShowUploadStorie} />
+      )}
+      {showVerification && (
+        <Verification setShowVerification={setShowVerification} />
+      )}
       <HeaderContent>
         <ContainerHeader>
           <TabsMenu />
@@ -71,9 +95,17 @@ const HomeContent = () => {
       </HeaderContent>
       <BodyContent>
         <Video show={showVideo && activeTab === 0 ? "true" : "false"} />
-        {activeTab === 0 && !showVideo && <StartHome />}
+        {activeTab === 0 && !showVideo && (
+          <>
+            {/* <Kyc setShowVerification={setShowVerification} /> */}
+            <StartHome
+              setShowStories={setShowStories}
+              setShowUploadStorie={setShowUploadStorie}
+            />
+          </>
+        )}
         {activeTab === 1 && <Messages />}
-        {activeTab === 2 && <>RANKING</>}
+        {activeTab === 2 && <Ranking />}
         {activeTab === 3 && <Profile />}
       </BodyContent>
     </LayoutWrapper>

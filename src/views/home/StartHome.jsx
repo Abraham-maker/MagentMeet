@@ -28,19 +28,24 @@ import {
 import { setLoading } from "../../store/actions/agora";
 import { initAgoraRTC } from "../../store/actions/agoraRTC";
 import { initAgoraRTM } from "../../store/actions/agoraRTM";
-import { handleModalChannel } from "../../store/actions/modals";
+import {
+  handleModalChannel,
+  handleModalMinutes,
+} from "../../store/actions/modals";
 
-const StartHome = () => {
+const StartHome = ({ setShowStories, setShowUploadStorie }) => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth.userData);
+  const myHistory = useSelector((state) => state.auth.myHistory);
   const channel = useSelector((state) => state.functionAgora.channelActive);
   const isLoading = useSelector((state) => state.agora.isLoading);
+  const counterMale = useSelector((state) => state.auth.counterMale);
 
   useEffect(() => {
     if (userData.gender === "male") {
       const intervalId = setInterval(() => {
         dispatch(getChannelActive());
-      }, 5000);
+      }, 2000);
       return () => clearInterval(intervalId);
     }
   }, [userData]);
@@ -81,15 +86,25 @@ const StartHome = () => {
           <Content>
             <img src="/assets/images/wrapper.jpeg" alt="" />
           </Content>
-          <ContentHistory>
-            <ButtonHistory>
-              <TextTitle>Sube un video</TextTitle>
+          <ContentHistory
+            onClick={() => {
+              if (myHistory === false) {
+                setShowUploadStorie(true);
+              }
+            }}
+          >
+            <ButtonHistory active={myHistory === false ? "false" : "true"}>
+              <TextTitle>
+                {!myHistory ? "Sube un video" : "No puedes subir un video"}
+              </TextTitle>
               <SpanPlusContainer>
                 <SpanPlusContent>
                   <img src="/assets/svg/plus.svg" alt="" />
                 </SpanPlusContent>
               </SpanPlusContainer>
-              <TextSub>✨ ¡Puntos por cada Me gusta!</TextSub>
+              {myHistory === false && (
+                <TextSub>✨ ¡Puntos por cada Me gusta!</TextSub>
+              )}
             </ButtonHistory>
           </ContentHistory>
         </ContainerHistory>
@@ -101,14 +116,25 @@ const StartHome = () => {
       </Text>
       <ContainerContentHome $gender={userData.gender}>
         {userData.gender === "male" && (
-          <ButtonStart $gender={userData.gender}>Ver Historias</ButtonStart>
+          <ButtonStart
+            $gender={userData.gender}
+            onClick={() => {
+              setShowStories(true);
+            }}
+          >
+            Ver Historias
+          </ButtonStart>
         )}
         {userData.gender === "male" && <DividerMale>or</DividerMale>}
         <ButtonStart
           $gender={userData.gender}
           onClick={() => {
-            if (!isLoading) {
-              startVideoChat();
+            if (counterMale === 0) {
+              dispatch(handleModalMinutes());
+            } else {
+              if (!isLoading) {
+                startVideoChat();
+              }
             }
           }}
         >

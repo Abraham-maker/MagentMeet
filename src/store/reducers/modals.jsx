@@ -3,12 +3,14 @@ import {
   MODAL_CHANNEL,
   MODAL_BLOQUED_PERMISSIONS,
   RESET_STATE_MODAL,
+  MODAL_MINUTES,
 } from "../actions/modals";
 
 const initialState = {
   modalPermissions: false,
   modalChannel: false,
   modalBloqued: false,
+  modalMinutes: false,
 };
 
 export default (state = initialState, action) => {
@@ -27,6 +29,11 @@ export default (state = initialState, action) => {
       return {
         ...state,
         modalBloqued: action.modalBloqued,
+      };
+    case MODAL_MINUTES:
+      return {
+        ...state,
+        modalMinutes: action.modalMinutes,
       };
     case RESET_STATE_MODAL:
       return initialState;

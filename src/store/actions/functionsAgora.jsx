@@ -56,8 +56,8 @@ export const getHost = () => {
   return async (dispatch, getState) => {
     const { channelActive } = getState().functionAgora;
     const randomIndex = Math.floor(Math.random() * channelActive.length);
-    const randomElement = channelActive[randomIndex].host;
-    dispatch({ type: HOST, host: randomElement });
+    const randomElement = channelActive[randomIndex];
+    dispatch({ type: HOST, host: randomElement.host });
     dispatch({
       type: ID_USER_FEMALE_REMOTE,
       idRemoteUser: randomElement.userID,
@@ -134,7 +134,6 @@ export const closeCall = () => {
     });
 
     const data = await response.json();
-    console.log("CLOSE CALL FEMALE", data);
     return data;
   };
 };
@@ -152,7 +151,6 @@ export const removeHost = () => {
     });
 
     const data = await response.json();
-    console.log("REMOVE HOST FEMALE", data);
     return data;
   };
 };
@@ -179,7 +177,6 @@ export const enterHostMale = () => {
 
     const data = await response.json();
     dispatch({ type: ID_HOST_MALE, idHostCreateMale: data.data.id });
-    console.log("MALE ENTER CALL", data);
     return data;
   };
 };
@@ -188,7 +185,8 @@ export const enterHostMale = () => {
 // ESTO SOLO PARA LOS HOMBRES
 export const closeHostMale = () => {
   return async (dispatch, getState) => {
-    const { host, idHostCreateMale } = getState().agora;
+    const { host } = getState().agora;
+    const { idHostCreateMale } = getState().functionAgora;
     const { userData } = getState().auth;
 
     let formdata = new FormData();
@@ -206,19 +204,17 @@ export const closeHostMale = () => {
     });
 
     const data = await response.json();
-    console.log("CLOSE ENTER CALL MALE", data);
     return data;
   };
 };
 
 // *TODO // REGISTRA EL ENVIO DE REGALOS
 // ESTO SOLO PARA LOS HOMBRES
-export const SendGiftHost = (giftID) => {
+export const sendGiftHost = (giftID) => {
   return async (dispatch, getState) => {
     const { host } = getState().agora;
     const { userData } = getState().auth;
     const { idRemoteUser } = getState().functionAgora;
-
     let formdata = new FormData();
     formdata.append("user_id_sends", userData.id);
     formdata.append("user_id_receives", idRemoteUser);
@@ -235,7 +231,28 @@ export const SendGiftHost = (giftID) => {
     });
 
     const data = await response.json();
-    console.log("GIFT ENVIADO", data);
+    return data;
+  };
+};
+
+export const translate = (text, rtmUid) => {
+  return async (dispatch, getState) => {
+    const { idRemoteUser } = getState().functionAgora;
+    var formData = new FormData();
+    formData.append("text", text);
+    formData.append("target_lang", "EN");
+    formData.append("senderid", rtmUid);
+    formData.append("user_id", idRemoteUser);
+
+    const response = await fetch(SERVER_URL + `translate`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        Authorization: getState().auth.token.userData,
+      },
+      body: formData,
+    });
+    const data = await response.json();
     return data;
   };
 };

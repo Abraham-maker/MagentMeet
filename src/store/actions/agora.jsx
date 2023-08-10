@@ -1,13 +1,15 @@
 import { SERVER_URL } from "../../environment/server";
-import { createLocalTracks, joinRtcChannel } from "./agoraRTC";
+import { createLocalTracks, initAgoraRTC, joinRtcChannel } from "./agoraRTC";
 import { initAgoraRTM } from "./agoraRTM";
 import { deleteCounterFemale, getUserData, pauseCounter } from "./auth";
 import {
+  ID_USER_FEMALE_REMOTE,
   closeCall,
   closeHostMale,
   getHost,
   removeHost,
 } from "./functionsAgora";
+import { handleModalChannel } from "./modals";
 import { handleShowHome } from "./tabs";
 
 export const CLIENT_RTC = "CLIENT_RTC";
@@ -27,7 +29,9 @@ export const ERRORS_AGORA = "ERRORS_AGORA";
 export const IS_LOADING = "IS_LOADING";
 export const COUNTER_FEMALE = "COUNTER_FEMALE";
 export const MUTED = "MUTED";
+export const MEMBER_UPDATE_LEFT = "MEMBER_UPDATE_LEFT";
 export const RESET_STATE_AGORA = "RESET_STATE_AGORA";
+export const RESET_MEMBERS_CHANNEL = "RESET_MEMBERS_CHANNEL";
 
 // *TODO // FUNCTION FOR AGORA RTC
 //
@@ -78,11 +82,11 @@ export const saveHost = (host) => {
 
 // *TODO // FUNCTION FOR AGORA RTM
 //
-export const saveMessages = (data, senderId) => {
+export const saveMessages = (text, translate, senderId) => {
   return async (dispatch, getState) => {
     await dispatch({
       type: MESSAGES,
-      messages: { text: data.text, sender: senderId },
+      messages: { text: text, sender: senderId, translate: translate },
     });
   };
 };
@@ -117,6 +121,12 @@ export const saveMembersChannel = (memberId, name, userRtcUid) => {
       type: MEMBERS_CHANNEL,
       membersChannel: { memberId: memberId, name: name, rtcUid: userRtcUid },
     });
+  };
+};
+
+export const setMembersChannel = (memberId) => {
+  return async (dispatch) => {
+    await dispatch({ type: MEMBER_UPDATE_LEFT, payload: memberId });
   };
 };
 
@@ -200,12 +210,20 @@ export const leave = () => {
         await dispatch(deleteCounterFemale());
         await dispatch(removeHost());
         await dispatch(closeCall());
+        await dispatch({
+          type: RESET_MEMBERS_CHANNEL,
+          membersChannel: [],
+        });
         break;
       case "male":
         await clientRtc.leave();
         await clientRtm.logout();
         await dispatch(pauseCounter());
         await dispatch(closeHostMale());
+        await dispatch({
+          type: RESET_MEMBERS_CHANNEL,
+          membersChannel: [],
+        });
         break;
       default:
         break;
@@ -217,7 +235,10 @@ export const leave = () => {
 
 export const changeForUsers = () => {
   return async (dispatch, getState) => {
-    const { channelActive, clientRtm, clientRtc } = getState().functionAgora;
+    const { channelActive } = getState().functionAgora;
+    const { clientRtm, clientRtc } = getState().agora;
+    dispatch({ type: AUDIO_TRACKS, audioTracks: null });
+    dispatch({ type: VIDEO_TRACKS, videoTracks: null });
     try {
       await clientRtc.leave();
       await clientRtm.logout();
@@ -227,11 +248,6 @@ export const changeForUsers = () => {
         await dispatch(getUserData());
         await dispatch(handleShowHome());
       } else {
-        dispatch({ type: AUDIO_TRACKS, audioTracks: null });
-        dispatch({ type: VIDEO_TRACKS, videoTracks: null });
-        dispatch({ type: RESET_MESSAGES, messages: [] });
-        dispatch({ type: RESET_GIFT_RECEIVED, giftReceived: [] });
-        dispatch({ type: RESET_GIFT_SENDING, giftSending: [] });
         await dispatch(getHost());
         await dispatch(initAgoraRTM());
         await dispatch(createLocalTracks());
@@ -239,6 +255,24 @@ export const changeForUsers = () => {
       }
     } catch (error) {
       console.error("Error al cambiar de canal:", error);
+    }
+  };
+};
+
+export const initAgoraMessage = (host, id) => {
+  return async (dispatch, getState) => {
+    const { channelActive } = getState().functionAgora;
+    dispatch({ type: HOST, host: host });
+    dispatch({
+      type: ID_USER_FEMALE_REMOTE,
+      idRemoteUser: id,
+    });
+    if (channelActive.length === 0) {
+      await dispatch(handleModalChannel());
+    } else {
+      await dispatch(setLoading());
+      await dispatch(initAgoraRTM());
+      await dispatch(initAgoraRTC());
     }
   };
 };

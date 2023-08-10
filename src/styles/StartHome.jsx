@@ -221,7 +221,10 @@ export const ButtonHistory = styled.div`
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background: linear-gradient(160deg, #1ca5fc, #9f6095);
+  background: ${(props) =>
+    props.active !== "false"
+      ? "linear-gradient(160deg, #F4F4F4, #ccc)"
+      : "linear-gradient(160deg, #1ca5fc, #9f6095)"};
   border: none;
   border-radius: 4px;
   outline: none;

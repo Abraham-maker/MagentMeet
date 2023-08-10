@@ -1,6 +1,7 @@
 export const MODAL_PERMISSIONS = "MODAL_PERMISSIONS";
 export const MODAL_BLOQUED_PERMISSIONS = "MODAL_BLOQUED_PERMISSIONS";
 export const MODAL_CHANNEL = "MODAL_CHANNEL";
+export const MODAL_MINUTES = "MODAL_MINUTES";
 export const RESET_STATE_MODAL = "RESET_STATE_MODAL";
 
 export const handleModalPermission = () => {
@@ -29,6 +30,16 @@ export const handleModalBloqued = () => {
     await dispatch({
       type: MODAL_BLOQUED_PERMISSIONS,
       modalBloqued: !modalBloqued,
+    });
+  };
+};
+
+export const handleModalMinutes = () => {
+  return async (dispatch, getState) => {
+    const { modalMinutes } = getState().modals;
+    await dispatch({
+      type: MODAL_MINUTES,
+      modalMinutes: !modalMinutes,
     });
   };
 };

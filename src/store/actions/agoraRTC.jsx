@@ -33,6 +33,7 @@ export const initAgoraRTC = () => {
       }
       await dispatch(createLocalTracks());
       await dispatch(joinRtcChannel());
+      dispatch(handleModalPermission());
     } catch (error) {
       console.log("ERROR", error);
       if (error.code === "PERMISSION_DENIED") {
@@ -74,7 +75,7 @@ export const createLocalTracks = () => {
 
     dispatch(saveVideoTracks(videoTracks));
     dispatch(saveAudioTracks(audioTracks));
-    dispatch(handleModalPermission());
+    // dispatch(handleModalPermission());
   };
 };
 
@@ -94,7 +95,6 @@ export const joinRtcChannel = () => {
 
     const { userData, timeRemaining } = getState().auth;
     const { appID, host, token, rtcUid } = await getState().agora;
-
     await clientRtc.join(appID, host, token, rtcUid);
     await dispatch(startAndPublishTracks());
 

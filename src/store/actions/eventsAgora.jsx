@@ -2,13 +2,20 @@ import {
   saveMessages,
   saveGift,
   saveMembersChannel,
-  clearGift,
-  clearMessages,
+  setMembersChannel,
+  RESET_MESSAGES,
+  RESET_GIFT_RECEIVED,
+  RESET_GIFT_SENDING,
 } from "./agora";
+import { translate } from "./functionsAgora";
 
 export const channelMessage = (data, senderId) => {
   return async (dispatch) => {
-    await dispatch(saveMessages(data, senderId));
+    const response = await dispatch(translate(data.text, senderId));
+    if (response.status === "Success") {
+      const { data } = response;
+      await dispatch(saveMessages(data.text, data.translations, data.senderid));
+    }
   };
 };
 
@@ -38,7 +45,9 @@ export const handleMemberJoined = (memberId) => {
 
 export const handleMemberLeft = (memberId) => {
   return async (dispatch) => {
-    await dispatch(clearGift());
-    await dispatch(clearMessages());
+    dispatch(setMembersChannel(memberId));
+    dispatch({ type: RESET_MESSAGES, messages: [] });
+    dispatch({ type: RESET_GIFT_RECEIVED, giftReceived: [] });
+    dispatch({ type: RESET_GIFT_SENDING, giftSending: [] });
   };
 };

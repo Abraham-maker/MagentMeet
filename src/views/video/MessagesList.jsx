@@ -44,8 +44,9 @@ const MessagesList = ({ showMessages, showControls }) => {
                   <>
                     {messages.map((item, index) => {
                       const member = membersChannel.find(
-                        (m) => m.memberId === item.sender
+                        (m) => m.memberId == item.sender
                       );
+
                       const senderName = member.name;
                       return (
                         <Message
@@ -57,23 +58,28 @@ const MessagesList = ({ showMessages, showControls }) => {
                           animate="animate"
                           exit="hidden"
                         >
-                          <Text fontSize="13px" color={"#000"}>
+                          <Text fontSize="13px" color={"#1e293c"}>
                             <Span
                               fontSize="13px"
                               color={
                                 member.name === userData.name
                                   ? "#1987cd"
-                                  : "#e83e8c  "
+                                  : "#e83e8c"
                               }
                               fontWeight="600"
                             >
                               {userData.name === senderName ? "Me" : senderName}
                               :
                             </Span>{" "}
+                            <br />
                             {item.text}
                           </Text>
-                          <Text fontSize="12px" color="" fontWeight="400">
-                            Traduccion
+                          <Text
+                            fontSize="12px"
+                            color="#acafc0"
+                            fontWeight="400"
+                          >
+                            {item.translate}
                           </Text>
                         </Message>
                       );
@@ -83,7 +89,7 @@ const MessagesList = ({ showMessages, showControls }) => {
                   <>
                     {messages.map((item, index) => {
                       const member = membersChannel.find(
-                        (m) => m.memberId === item.sender
+                        (m) => m.memberId == item.sender
                       );
                       const senderName = member.name;
                       return (
@@ -96,7 +102,7 @@ const MessagesList = ({ showMessages, showControls }) => {
                           animate="animate"
                           exit="hidden"
                         >
-                          <Text fontSize="13px" color={"#000"}>
+                          <Text fontSize="13px" color={"#1e293c"}>
                             <Span
                               fontSize="13px"
                               color={
@@ -109,10 +115,15 @@ const MessagesList = ({ showMessages, showControls }) => {
                               {userData.name === senderName ? "Me" : senderName}
                               :
                             </Span>{" "}
+                            <br />
                             {item.text}
                           </Text>
-                          <Text fontSize="12px" color="" fontWeight="400">
-                            Traduccion
+                          <Text
+                            fontSize="12px"
+                            color="#acafc0"
+                            fontWeight="400"
+                          >
+                            {item.translate}
                           </Text>
                         </Message>
                       );

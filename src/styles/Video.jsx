@@ -416,33 +416,87 @@ export const SendGiftContainer = styled.div`
 
 export const ReceivedAndSend = styled.div`
   position: absolute;
-  right: 1rem;
+  right: 0.5rem;
   top: 13em;
-  width: calc(200px - 1rem);
-  max-height: 280px;
-  min-height: 30px;
-  overflow: hidden;
-  background-color: rgba(0, 0, 0, 0.5);
-  overflow-y: auto;
-  border-radius: 5px;
-  user-select: none;
+  ${(props) => {
+    switch (props.$gender) {
+      case "female":
+        return css`
+          width: calc(200px - 1rem);
+          max-height: 280px;
+          min-height: 30px;
+          overflow: hidden;
+          background-color: rgba(0, 0, 0, 0.5);
+          overflow-y: auto;
+          border-radius: 5px;
+          user-select: none;
 
-  @media screen and (max-width: 699px) {
-    width: calc(150px - 1rem);
-    min-height: 30px;
-    max-height: 300px;
-  }
+          @media screen and (max-width: 699px) {
+            width: calc(150px - 1rem);
+            min-height: 30px;
+            max-height: 300px;
+          }
 
-  @media screen and (max-height: 900px) {
-    width: calc(300px - 1rem);
-    height: 150px;
-  }
+          @media screen and (max-height: 900px) {
+            max-width: calc(300px - 1rem);
+            max-height: 150px;
+            min-width: calc(150px - 1rem);
+            min-height: 30px;
+          }
+        `;
+      case "male":
+        return css`
+          display: flex;
+          flex-direction: column;
+          overflow-y: auto;
+          gap: 10px;
+          width: calc(270px - 1rem);
+          max-height: 280px;
+          min-height: 30px;
+
+          @media screen and (max-width: 699px) {
+            width: calc(150px - 1rem);
+            min-height: 30px;
+            max-height: 300px;
+          }
+
+          @media screen and (max-height: 900px) {
+            width: calc(300px - 1rem);
+            height: 150px;
+          }
+        `;
+      default:
+        return;
+    }
+  }}
 `;
 
 export const ReceivedAndSendContainer = styled.div`
-  padding: 10px;
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  gap: 20px;
+  ${(props) => {
+    switch (props.$gender) {
+      case "female":
+        return css`
+          padding: 10px;
+          display: flex;
+          justify-content: space-around;
+          flex-wrap: wrap;
+          gap: 20px;
+        `;
+      case "male":
+        return css`
+          padding: 5px;
+          border-radius: 4px;
+          font-size: 14px;
+          max-width: 95%;
+          font-weight: 500;
+          word-wrap: break-word;
+          user-select: none;
+          background-color: #1ca5fc;
+          color: #fff;
+          flex-wrap: wrap;
+        `;
+      default:
+        return;
+    }
+  }}
 `;

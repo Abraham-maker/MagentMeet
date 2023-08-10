@@ -9,6 +9,9 @@ import {
   TIEMPO_RESTANTE,
   RESET_STATE_AUTH,
   COUNTRIS,
+  STORIES,
+  MY_HISTORY,
+  RANKING_LIST,
 } from "../actions/auth";
 
 const initialState = {
@@ -21,6 +24,9 @@ const initialState = {
   counterMale: 0,
   timeRemaining: null,
   countris: [],
+  stories: [],
+  myHistory: false,
+  rankingList: [],
 };
 
 export default (state = initialState, action) => {
@@ -69,6 +75,21 @@ export default (state = initialState, action) => {
       return {
         ...state,
         countris: action.countris,
+      };
+    case STORIES:
+      return {
+        ...state,
+        stories: action.stories,
+      };
+    case MY_HISTORY:
+      return {
+        ...state,
+        myHistory: action.myHistory,
+      };
+    case RANKING_LIST:
+      return {
+        ...state,
+        rankingList: action.rankingList,
       };
     case RESET_STATE_AUTH:
       return initialState;

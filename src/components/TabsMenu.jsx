@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TabsMenuLeftContainer,
   ContentLeft,
@@ -29,8 +29,10 @@ import {
 } from "../styles/TabsMenu";
 import { useDispatch, useSelector } from "react-redux";
 import { setActiveTab } from "../store/actions/tabs";
+import { leave } from "../store/actions/agora";
 
 export const ListTabsMale = () => {
+  const dispatch = useDispatch();
   const [showMinutes, setShowMinutes] = useState(false);
   const counterMale = useSelector((state) => state.auth.counterMale);
 
